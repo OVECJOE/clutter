@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { headers } from "next/headers";
+import { Alert } from "@mui/material";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
-import { SubmitButton } from "./submit-button";
+import { SubmitButton } from "../../components/ui/submit-button";
 
 export default function Login({
   searchParams,
@@ -22,10 +23,10 @@ export default function Login({
     });
 
     if (error) {
-      return redirect("/login?message=Could not authenticate user");
+      return redirect(`/login?message=${encodeURIComponent(error.message)}`);
     }
 
-    return redirect("/protected");
+    return redirect("/dashboard");
   };
 
   const signUp = async (formData: FormData) => {
@@ -45,18 +46,19 @@ export default function Login({
     });
 
     if (error) {
-      return redirect("/login?message=Could not authenticate user");
+      return redirect(`/login?message=${encodeURIComponent(error.message)}`);
     }
 
     return redirect("/login?message=Check email to continue sign in process");
   };
 
   return (
-    <div className="flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2">
+    <div className="flex flex-col gap-10 w-full p-8 lg:px-2 sm:max-w-md justify-center">
       <Link
         href="/"
-        className="absolute left-8 top-8 py-2 px-4 rounded-md no-underline text-foreground bg-btn-background hover:bg-btn-background-hover flex items-center group text-sm"
+        className="py-2 px-4 rounded-md no-underline text-foreground bg-btn-background hover:bg-btn-background-hover flex items-center w-fit group text-sm"
       >
+        {/* biome-ignore lint/a11y/noSvgWithoutTitle: <explanation> */}
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -73,6 +75,10 @@ export default function Login({
         </svg>{" "}
         Back
       </Link>
+
+      {searchParams?.message && (
+        <Alert severity="error" className="mb-5">{searchParams.message}</Alert>
+      )}
 
       <form className="flex-1 flex flex-col w-full justify-center gap-2 text-foreground">
         <label className="text-md" htmlFor="email">
@@ -108,11 +114,6 @@ export default function Login({
         >
           Sign Up
         </SubmitButton>
-        {searchParams?.message && (
-          <p className="mt-4 p-4 bg-foreground/10 text-foreground text-center">
-            {searchParams.message}
-          </p>
-        )}
       </form>
     </div>
   );

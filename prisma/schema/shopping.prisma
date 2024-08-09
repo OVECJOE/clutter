@@ -1,0 +1,29 @@
+model ShoppingList {
+    id        String  @id @default(uuid())
+    user_id   String
+    name      String  @db.VarChar(128)
+    is_public Boolean @default(false)
+
+    created_at DateTime @default(now())
+    updated_at DateTime @updatedAt
+
+    items ShoppingListItem[]
+
+    @@unique([user_id, name])
+    @@map("shopping_lists")
+}
+
+model ShoppingListItem {
+    id           String  @id @default(uuid())
+    list_id      String  @db.VarChar(64)
+    item_id      String  @db.VarChar(64)
+    quantity     Int     @db.Integer
+    unit         String  @db.VarChar(32)
+    is_purchased Boolean @default(false)
+
+    list ShoppingList @relation(fields: [list_id], references: [id])
+    item Item         @relation(fields: [item_id], references: [id])
+
+    @@unique([list_id, item_id])
+    @@map("shopping_list_items")
+}

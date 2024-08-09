@@ -1,0 +1,26 @@
+model Inventory {
+    id            String    @id @default(uuid())
+    item_id       String    @db.VarChar(64)
+    user_id       String
+    quantity      Int       @db.Integer
+    unit          String    @db.VarChar(32)
+    expiry_date   DateTime?
+    purchase_date DateTime
+    location_id   String    @db.VarChar(64)
+    note          String?
+
+    item     Item     @relation(fields: [item_id], references: [id])
+    location Location @relation(fields: [location_id], references: [id])
+
+    @@unique([item_id, user_id, location_id])
+    @@index([user_id])
+    @@map("inventories")
+}
+
+model Location {
+    id          String  @id @default(uuid())
+    name        String  @db.VarChar(64)
+    description String? @db.Text
+
+    inventories Inventory[]
+}

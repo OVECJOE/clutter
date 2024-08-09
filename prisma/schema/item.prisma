@@ -1,0 +1,33 @@
+model Item {
+    id           String  @id @default(uuid())
+    name         String  @db.VarChar(128)
+    description  String? @db.Text
+    barcode      String? @db.VarChar(64)
+    default_unit String  @db.VarChar(32)
+    category_id  String  @db.VarChar(64)
+
+    category Category @relation(fields: [category_id], references: [id])
+
+    inventories         Inventory[]
+    shopping_list_items ShoppingListItem[]
+
+    @@map("items")
+}
+
+model Category {
+    id          String  @id @default(uuid())
+    name        String  @db.VarChar(64)
+    description String? @db.Text
+    parent_id   String?
+
+    // Self-relation for parent category
+    parent   Category?  @relation("CategoryToCategory", fields: [parent_id], references: [id])
+    children Category[] @relation("CategoryToCategory")
+
+    // One-to-many relation with Item
+    items Item[]
+
+    // For better query performance
+    @@index([parent_id])
+    @@map("categories")
+}
