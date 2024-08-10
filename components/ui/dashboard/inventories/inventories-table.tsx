@@ -7,7 +7,7 @@ import type {
   GridRowsProp,
   GridRowModel,
   GridEventListener,
-  GridSlots
+  GridSlots,
 } from "@mui/x-data-grid";
 import {
   DataGrid,
@@ -16,9 +16,10 @@ import {
   GridRowModes,
 } from "@mui/x-data-grid";
 import { Button, Box } from "@mui/material";
-import { MenuOpenRounded, Cancel, Edit, Save, Delete, Add } from "@mui/icons-material";
+import { Cancel, Edit, Save, Delete, Add } from "@mui/icons-material";
 import { useState } from "react";
 import { GridRowEditStopReasons } from "@mui/x-data-grid";
+import Link from "next/link";
 
 const useColumns = () => {
   const [rows, setRows] = useState<GridRowsProp>([]);
@@ -49,18 +50,17 @@ const useColumns = () => {
   };
 
   const columns: GridColDef[] = [
-    { field: 'id', headerName: 'ID' },
-    { field: 'name', headerName: 'Item Name' },
-    { field: 'description', headerName: 'Description' },
+    { field: 'name', headerName: 'Item Name', editable: true },
+    { field: 'description', headerName: 'Description', editable: true, width: 200 },
     { field: 'default_unit', headerName: 'Default Unit' },
-    { field: 'quantity', headerName: 'Quantity' },
+    { field: 'quantity', headerName: 'Quantity', type: 'number', editable: true },
     { field: 'category', headerName: 'Category' },
-    { field: 'expiry_date', headerName: 'Expiry Date' },
-    { field: 'purchase_date', headerName: 'Purchase Date' },
+    { field: 'expiry_date', headerName: 'Expiry Date', type: 'dateTime', editable: true },
+    { field: 'purchase_date', headerName: 'Purchase Date', type: 'dateTime' },
     {
       field: 'actions',
       headerName: 'Actions',
-      width: 130, sortable: false,
+      sortable: false,
       filterable: false,
       type: 'actions',
       cellClassName: 'actions',
@@ -121,19 +121,22 @@ interface EditToolbarProps {
 function EditToolbar(props: EditToolbarProps) {
   const { setRows, setRowModesModel } = props;
 
-  const handleClick = () => {
-    const id: string = Math.random().toString(36).substr(2, 9);
-    setRows((oldRows) => [...oldRows, { id, name: '', age: '', isNew: true }]);
-    setRowModesModel((oldModel) => ({
-      ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
-    }));
-  };
-
   return (
     <GridToolbarContainer>
-      <Button color="primary" startIcon={<Add />} onClick={handleClick}>
-        Add record
+      <Button
+        color="success"
+        startIcon={<Add />}
+        LinkComponent={Link}
+        href="/dashboard/inventories/new"
+      >
+        Add New
+      </Button>
+      <Button
+        color="error"
+        startIcon={<Delete />}
+        disabled
+      >
+        Delete Selected
       </Button>
     </GridToolbarContainer>
   );
@@ -173,7 +176,7 @@ export default function InventoriesTable() {
       <DataGrid
         rows={rows}
         columns={columns}
-        className="w-full md:max-w-3xl lg:max-w-4xl"
+        className="w-full sm:max-w-lg md:max-w-3xl lg:max-w-4xl"
         editMode="row"
         rowModesModel={rowModesModel}
         onRowModesModelChange={handleRowModesModelChange}
